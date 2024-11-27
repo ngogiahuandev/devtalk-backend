@@ -2,7 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginInput, AuthResponse } from 'src/auth/dto/login.dto';
-import { RegisterInput } from 'src/auth/dto/register.dto';
+import { RegisterInput, RegisterResponse } from 'src/auth/dto/register.dto';
 import { UserDto } from 'src/auth/dto/user.dto';
 import { AuthGuard } from 'src/auth/guards/graphql-auth.guard';
 import { RefreshTokenAuthGuard } from 'src/auth/guards/refresh-token.guard';
@@ -21,8 +21,7 @@ export class AuthResolver {
     return this.authService.login(payload);
   }
 
-  @UseGuards(AuthGuard)
-  @Mutation(() => UserDto, { name: 'register' })
+  @Mutation(() => RegisterResponse, { name: 'register' })
   async register(@Args('payload') payload: RegisterInput) {
     return this.authService.register(payload);
   }
@@ -35,5 +34,12 @@ export class AuthResolver {
   ) {
     const user = context.req.user;
     return this.authService.refreshTokens(refreshToken, user);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => UserDto, { name: 'me' })
+  async me(@Context() context) {
+    const user = context.req.user;
+    return user as UserDto;
   }
 }

@@ -20,8 +20,9 @@ input LoginInput {
 
 type Mutation {
   login(payload: LoginInput!): AuthResponse!
+  me: UserDto!
   refreshTokens(refreshToken: String!): AuthResponse!
-  register(payload: RegisterInput!): UserDto!
+  register(payload: RegisterInput!): RegisterResponse!
 }
 
 type Query {
@@ -33,6 +34,10 @@ input RegisterInput {
   email: String!
   password: String!
   username: String!
+}
+
+type RegisterResponse {
+  user: UserDto!
 }
 
 """User roles"""

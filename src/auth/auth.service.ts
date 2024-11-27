@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { GraphQLError } from 'graphql';
 import { LoginInput, AuthResponse } from 'src/auth/dto/login.dto';
-import { RegisterInput } from 'src/auth/dto/register.dto';
+import { RegisterInput, RegisterResponse } from 'src/auth/dto/register.dto';
 import { User } from '@prisma/client';
 import { UserDto } from 'src/auth/dto/user.dto';
 
@@ -119,7 +119,7 @@ export class AuthService {
     return { accessToken, refreshToken, user };
   }
 
-  async register(payload: RegisterInput): Promise<UserDto> {
+  async register(payload: RegisterInput): Promise<RegisterResponse> {
     const { email, password, username, confirmPassword } = payload;
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -138,7 +138,9 @@ export class AuthService {
         username,
       },
     });
-    return this.mapUserToDto(user);
+    return {
+      user: this.mapUserToDto(user),
+    };
   }
 
   async refreshTokens(

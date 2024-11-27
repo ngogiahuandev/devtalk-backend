@@ -1,5 +1,6 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsEmail, MinLength } from 'class-validator';
+import { UserDto } from 'src/auth/dto/user.dto';
 
 @InputType()
 export class RegisterInput {
@@ -18,4 +19,10 @@ export class RegisterInput {
   @Field()
   @MinLength(6)
   confirmPassword: string;
+}
+
+@ObjectType()
+export class RegisterResponse {
+  @Field()
+  user: UserDto;
 }
