@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { GraphqlModule } from './graphql/graphql.module';
-import { AuthModule } from './auth/auth.module';
-import { JwtModule } from 'src/auth/jwt/jwt.module';
+import { AuthModule } from 'src/auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [GraphqlModule, AuthModule, JwtModule],
+  imports: [GraphqlModule, JwtModule, AuthModule],
 })
 export class AppModule {}

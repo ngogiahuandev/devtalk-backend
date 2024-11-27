@@ -36,31 +36,22 @@ export class AuthService {
   }
 
   async verifyToken(token: string): Promise<UserDto> {
-    const payload = this.decodeAndCheckExpiration(
-      token,
-      process.env.ACCESS_TOKEN_SECRET,
-    );
+    const payload = this.decodeToken(token, process.env.ACCESS_TOKEN_SECRET);
     return this.verifyUser(payload.sub);
   }
 
   async verifyRefreshToken(token: string): Promise<UserDto> {
-    const payload = this.decodeAndCheckExpiration(
-      token,
-      process.env.REFRESH_TOKEN_SECRET,
-    );
+    const payload = this.decodeToken(token, process.env.REFRESH_TOKEN_SECRET);
     return this.verifyUser(payload.sub);
   }
 
-  private decodeAndCheckExpiration(token: string, secret: string): any {
+  private decodeToken(token: string, secret: string): any {
     try {
-      const payload = this.jwtService.verify(token, { secret });
-      return payload;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return this.jwtService.verify(token, { secret });
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         throw new GraphQLError('Token expired');
       }
-
       throw new GraphQLError('Invalid or expired token');
     }
   }
@@ -78,10 +69,10 @@ export class AuthService {
     return userDto as UserDto;
   }
 
-  private async generateTokens(
+  private generateTokens(
     userId: string,
-    refreshTokenExpiresAt?: Date,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+    refreshTokenExpiry?: Date,
+  ): { accessToken: string; refreshToken: string } {
     const payload = { sub: userId };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -91,8 +82,8 @@ export class AuthService {
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.REFRESH_TOKEN_SECRET,
-      expiresIn: refreshTokenExpiresAt
-        ? Math.floor((refreshTokenExpiresAt.getTime() - Date.now()) / 1000)
+      expiresIn: refreshTokenExpiry
+        ? Math.floor((refreshTokenExpiry.getTime() - Date.now()) / 1000)
         : process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
 
