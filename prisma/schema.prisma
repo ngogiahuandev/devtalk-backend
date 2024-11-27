@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid()) 
   username  String    @unique
   email     String    @unique
   password  String
@@ -32,16 +32,17 @@ model User {
   bookmarks    Bookmark[]
   readHistory  ReadHistory[]
   notifications Notification[]
+  refreshTokens RefreshToken[]
 }
 
 model Post {
-  id          Int             @id @default(autoincrement())
+  id          String          @id @default(uuid()) 
   title       String
   body        String
   isDeleted   Boolean         @default(false) 
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
-  authorId    Int
+  authorId    String
   author      User            @relation(fields: [authorId], references: [id])
   comments    Comment[]
   likes       Like[]
@@ -52,28 +53,28 @@ model Post {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid()) 
   content   String
   isDeleted Boolean  @default(false) 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  postId    Int
+  postId    String
   post      Post     @relation(fields: [postId], references: [id])
-  authorId  Int
+  authorId  String
   author    User     @relation(fields: [authorId], references: [id])
 }
 
 model Tag {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  createdAt DateTime  @default(now())
-  isDeleted Boolean   @default(false) 
-  posts     Post[]    @relation("PostTags")
+  id        String   @id @default(uuid()) 
+  name      String   @unique
+  createdAt DateTime @default(now())
+  isDeleted Boolean  @default(false) 
+  posts     Post[]   @relation("PostTags")
 }
 
 model Image {
-  id        Int      @id @default(autoincrement())
-  postId    Int
+  id        String   @id @default(uuid()) 
+  postId    String
   imageUrl  String
   isDeleted Boolean  @default(false) 
   createdAt DateTime @default(now())
@@ -81,9 +82,9 @@ model Image {
 }
 
 model Like {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  postId    Int
+  id        String   @id @default(uuid()) 
+  userId    String
+  postId    String
   createdAt DateTime @default(now())
   isDeleted Boolean  @default(false) 
   user      User     @relation(fields: [userId], references: [id])
@@ -91,9 +92,9 @@ model Like {
 }
 
 model Bookmark {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  postId    Int
+  id        String   @id @default(uuid()) 
+  userId    String
+  postId    String
   createdAt DateTime @default(now())
   isDeleted Boolean  @default(false) 
   user      User     @relation(fields: [userId], references: [id])
@@ -101,9 +102,9 @@ model Bookmark {
 }
 
 model ReadHistory {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  postId    Int
+  id        String   @id @default(uuid()) 
+  userId    String
+  postId    String
   readAt    DateTime @default(now())
   isDeleted Boolean  @default(false) 
   user      User     @relation(fields: [userId], references: [id])
@@ -111,14 +112,25 @@ model ReadHistory {
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id        String   @id @default(uuid()) 
+  userId    String
   type      String
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   isDeleted Boolean  @default(false) 
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
