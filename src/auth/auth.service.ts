@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { GraphQLError } from 'graphql';
@@ -27,7 +27,7 @@ export class AuthService {
     throw new GraphQLError('Invalid credentials');
   }
 
-  private async verifyUser(userId: string): Promise<UserDto> {
+  async verifyUser(userId: string): Promise<UserDto> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.isBanned) {
       throw new GraphQLError('User not found or banned');
@@ -54,15 +54,13 @@ export class AuthService {
   private decodeAndCheckExpiration(token: string, secret: string): any {
     try {
       const payload = this.jwtService.verify(token, { secret });
-
-      const now = Math.floor(Date.now() / 1000);
-      if (payload.exp < now) {
-        throw new GraphQLError('Token has expired');
-      }
-
       return payload;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new GraphQLError('Token expired');
+      }
+
       throw new GraphQLError('Invalid or expired token');
     }
   }

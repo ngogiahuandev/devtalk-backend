@@ -4,7 +4,8 @@ import { AuthService } from 'src/auth/auth.service';
 import { LoginInput, AuthResponse } from 'src/auth/dto/login.dto';
 import { RegisterInput } from 'src/auth/dto/register.dto';
 import { UserDto } from 'src/auth/dto/user.dto';
-import { GraphqlAuthGuard } from 'src/auth/guards/graphql-auth.guard';
+import { AuthGuard } from 'src/auth/guards/graphql-auth.guard';
+import { RefreshTokenAuthGuard } from 'src/auth/guards/refresh-token.guard';
 
 @Resolver()
 export class AuthResolver {
@@ -20,12 +21,13 @@ export class AuthResolver {
     return this.authService.login(payload);
   }
 
+  @UseGuards(AuthGuard)
   @Mutation(() => UserDto, { name: 'register' })
   async register(@Args('payload') payload: RegisterInput) {
     return this.authService.register(payload);
   }
 
-  @UseGuards(GraphqlAuthGuard)
+  @UseGuards(RefreshTokenAuthGuard)
   @Mutation(() => AuthResponse, { name: 'refreshTokens' })
   async refreshTokens(
     @Args('refreshToken') refreshToken: string,

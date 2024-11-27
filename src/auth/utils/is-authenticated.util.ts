@@ -14,12 +14,7 @@ export class IsAuthenticated {
 
     const token = authHeader.split(' ')[1];
 
-    try {
-      const user = await this.authService.verifyToken(token);
-      return user;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      throw new GraphQLError('Invalid or expired token');
-    }
+    const user = await this.authService.verifyToken(token);
+    return user;
   }
 }
