@@ -13,7 +13,7 @@ export class LoginInput {
 }
 
 @ObjectType()
-export class LoginResponse {
+export class AuthResponse {
   @Field()
   accessToken: string;
 
